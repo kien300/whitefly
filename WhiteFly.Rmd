@@ -1,0 +1,51 @@
+---
+title: "WhiteFly"
+author: "Kien TN"
+date: "February 23, 2018"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+source('whitefly.R')
+```
+
+## Cambodia data
+
+#### Cambodia Adult
+
+```{r cmA Adult Count, echo=FALSE}
+boxplot(SUM_A_adult~District, data = sum_CM, horizontal=T, main='Transect A Adlt Count')
+```
+
+```{r cmA Anova}
+summary(results1)
+```
+p-value is large and we fail to reject the Null Hypothesis, meaning that there is no significant difference in district means of Transect A.
+
+
+
+```{r cmB Adult Count, echo=FALSE}
+boxplot(SUM_B_adult~District, data = sum_CM, horizontal=T, main='Transect B Adlt Count')
+```
+
+```{r cmB Anova}
+summary(results2)
+```
+p-value is also large here. District means of Transect B are not significantly different. 
+
+
+#### Cambodia Nymph
+All are 1s. 
+```{r}
+table(cm$Transect_A_nymph)
+table(cm$Transect_B_nymph)
+```
+
+## Vietnam data
+
+#### Vietnam Adult
+```{r vnA Adult Count, echo=FALSE}
+boxplot(SUM_A_adult~District, data = sum_VN, horizontal=T,main="Transect A Adlt Count")
+```
+
