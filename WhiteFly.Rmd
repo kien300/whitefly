@@ -4,7 +4,11 @@ author: "Kien TN"
 date: "February 23, 2018"
 output: html_document
 ---
-
+<style type="text/css">
+body p {
+  color: #5040C7;
+}
+</style>
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
 source('whitefly.R')
@@ -13,39 +17,97 @@ source('whitefly.R')
 ## Cambodia data
 
 #### Cambodia Adult
+*NOTE that for each District, we use combined data of 20 plants of both Transect A and B.  
+Boxplot to show the distribution of mean per district.
 
 ```{r cmA Adult Count, echo=FALSE}
-boxplot(SUM_A_adult~District, data = sum_CM, horizontal=T, main='Transect A Adlt Count')
+ggplot(sum_CM, aes(District, SUM_adult)) +
+  geom_boxplot() + coord_flip()
 ```
 
+ANOVA test to see if there any difference between means.
 ```{r cmA Anova}
 summary(results1)
 ```
-p-value is large and we fail to reject the Null Hypothesis, meaning that there is no significant difference in district means of Transect A.
-
-
-
-```{r cmB Adult Count, echo=FALSE}
-boxplot(SUM_B_adult~District, data = sum_CM, horizontal=T, main='Transect B Adlt Count')
-```
-
-```{r cmB Anova}
-summary(results2)
-```
-p-value is also large here. District means of Transect B are not significantly different. 
+=> p-value is large and we fail to reject the Null Hypothesis, meaning that there is NO significant difference in district means of both Transect A and Transect B.
 
 
 #### Cambodia Nymph
-All are 1s. 
+All are 1s. Since the data is coded, and without detail, it's hard to conduct more statistical tests.
 ```{r}
 table(cm$Transect_A_nymph)
 table(cm$Transect_B_nymph)
 ```
 
+
 ## Vietnam data
 
 #### Vietnam Adult
+Similarly to what we did with Cambodia data, here, we start with the same boxplot, then ANOVA and depending on ANOVA's result, we conduct Tukey test.   
+*NOTE: we are not using data from Thuan Chau and Van Yen Districts where have fewer than 5 samples.
+
 ```{r vnA Adult Count, echo=FALSE}
-boxplot(SUM_A_adult~District, data = sum_VN, horizontal=T,main="Transect A Adlt Count")
+ggplot(sum_VN, aes(District, SUM_adult)) +
+  geom_boxplot() + coord_flip()
 ```
 
+```{r vnA Anova}
+summary(results3)
+```
+Significant p-value. = Possibilities of difference in District means. We proceed to he ad-hoc test to see where this difference is. 
+
+
+The following table shows significant pairs: these are pairs of districts that have significant difference in frequency of Nymph class (p-value smaller than 0.05)
+```{r vnA TukeyHSD}
+kable(tukey3)
+```
+
+
+
+#### Vietnam Nymph
+Because Nymph Class is Categorical data, we cannot apply Anova here. Instead, we are going to use Chi Squared test to see whether there are association between different Nymph Classes. 
+```{r vnA data table}
+table(vn$Transect_A_nymph)
+kable(vn_AN1, caption = "Distribution of Nymph Class per District")
+```
+
+
+The Association Plot below is a way of visualizing the distribution table above. Coloring from Blue to Red means going from Important to Not Important. This plot packs a lot of information, the tests we're going the conduct after will break down the infomation in our data.
+```{r vnA Association Plot, echo=FALSE}
+assoc(vn_AN2, shade=TRUE)
+```
+
+
+We use Chi Squared test to see if there are association between different levels of Nymph Count (3 levels: 0 to 5, 5 to 10, and 10 to 25)
+```{r vnA ChiSquared, warning=FALSE}
+chisq.test(vn_AN1)
+```
+
+
+Because Chi Squared gave significant results, we go on to do a post-hoc test to see what District pair have significant association. This following tables tells us which pair of Districts have significant assocition of Nymph Class frequency. 
+```{r vnA ChiSq post-hoc, warning=FALSE}
+kable(Chisq_vnA)
+```
+
+
+Apply similar procedure for Transect B
+```{r vnB data table}
+table(vn$Transect_B_nymph)
+kable(vn_BN1, caption = "Distribution of Nymph Class per District")
+```
+
+```{r vnB Association Plot, echo=FALSE}
+assoc(vn_BN2, shade=TRUE)
+```
+
+
+We use Chi Squared test to see if there are association between different levels of Nymph Count (4 levels: 0 to 5, 5 to 10, 10 to 25, and 25 to 50)
+```{r vnB ChiSquared, warning=FALSE}
+chisq.test(vn_BN1)
+```
+
+
+Table of significant pairs
+```{r vnB ChiSq post-hoc, warning=FALSE}
+kable(Chisq_vnB)
+```
